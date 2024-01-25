@@ -22,7 +22,7 @@ type TokenJson struct {
 }
 
 func TokenValidate(token string) (bool, error, string) {
-	splittedToken := strings.Split(".")
+	splittedToken := strings.Split(token, ".")
 
 	if len(splittedToken) != 3 {
 		log.Default().Println("Invalid Token.")
