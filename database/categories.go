@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
+	"strconv"
 
 	"github.com/SimonMora/bikesams_be/models"
 	_ "github.com/go-sql-driver/mysql"
@@ -40,4 +41,22 @@ func InsertCategory(category models.Category) (models.CategoryProcessResult, err
 	log.Default().Printf("Category succesfully saved with id: %d.", response.CategId)
 	return response, nil
 
+}
+
+func UpdateCategory(category models.Category) error {
+	log.Default().Println("Start to Update Category database")
+	var err error
+
+	err = DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return err
+	}
+
+	defer Db.Close()
+
+	sentence := "UPDATE category SET Categ_Name = '" + category.Categ_Name + "', Categ_Path = '" + category.Categ_Path + "' WHERE Categ_Id = " + strconv.Itoa(category.Categ_Id)
+	log.Default().Println(sentence) //Only uncomment for debug purposes
+
+	return nil
 }

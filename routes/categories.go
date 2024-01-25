@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"log"
+	"strconv"
 
 	"github.com/SimonMora/bikesams_be/database"
 	"github.com/SimonMora/bikesams_be/models"
@@ -45,4 +46,33 @@ func ProcessCategoryRequest(body string, User string) (int, string) {
 	}
 
 	return 200, string(catBytes)
+}
+
+func UpdateCategory(body string, User string, id int) (int, string) {
+	log.Default().Println("Start to process to update category..")
+	var t models.Category
+
+	// unmarshal body to struct and start body validations
+	err := json.Unmarshal([]byte(body), &t)
+	if err != nil {
+		return 400, "Bad request, body is not category parseable."
+	}
+
+	if len(t.Categ_Name) == 0 || len(t.Categ_Path) == 0 {
+		return 400, "Bad request, category name and category path, are required."
+	}
+
+	//validate if the user is and admin or not
+	isAdmin, msg := database.IsUserAdminValidate(User)
+	if !isAdmin {
+		return 400, msg
+	}
+
+	t.Categ_Id = id
+	updateErr := database.UpdateCategory(t)
+	if updateErr != nil {
+		return 400, "Error when trying to update the category: " + strconv.Itoa(id) + " > " + updateErr.Error()
+	}
+
+	return 200, "Updated entity."
 }
