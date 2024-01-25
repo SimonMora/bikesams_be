@@ -48,9 +48,11 @@ func Handlers(path string, method string, body string, headers map[string]string
 }
 
 func validateAuthorization(path string, method string, headers map[string]string) (bool, int, string) {
+	log.Default().Println("Start to validate Authorization..")
 
 	if (path == "products" && method == http.MethodGet) ||
 		(path == "category" && method == http.MethodGet) {
+		log.Default().Println("Authorization is not required..")
 		return true, 200, ""
 	}
 
@@ -71,7 +73,6 @@ func validateAuthorization(path string, method string, headers map[string]string
 	}
 
 	log.Default().Println("The token is OK..")
-
 	return true, 200, msg
 
 }
