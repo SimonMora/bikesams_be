@@ -49,3 +49,34 @@ func ConnStr(credentials models.SecretRdsJson) string {
 		dbUser, password, hostName, dbName,
 	)
 }
+
+func IsUserAdminValidate(userUIID string) (bool, string) {
+	log.Default().Println("Start user status validation..")
+
+	err := DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return false, err.Error()
+	}
+	defer Db.Close()
+
+	sentence := "SELECT 1 FROM users where User_Id = '" + userUIID + "' AND User_Status = 0;"
+
+	rows, errSql := Db.Query(sentence)
+	if err != nil {
+		log.Default().Println("Error executing SQL sentence..")
+		return false, errSql.Error()
+	}
+
+	var queryResult string
+	rows.Next()
+	rows.Scan(&queryResult)
+
+	log.Default().Println("User validation return status: " + queryResult)
+
+	if queryResult != "1" {
+		return false, "User is not an admin."
+	}
+
+	return true, ""
+}
