@@ -21,6 +21,15 @@ func ReadSecrets() error {
 }
 
 func DbConnect() error {
+	log.Default().Println("Start connection to db process..")
+	if len(SecretModel.Username) == 0 {
+		err = ReadSecrets()
+		if err != nil {
+			log.Default().Println("Error retrieving database secrets from SecretsManager")
+			return err
+		}
+	}
+
 	Db, err = sql.Open("mysql", ConnStr(SecretModel))
 	if err != nil {
 		log.Default().Println(err.Error())
@@ -33,8 +42,7 @@ func DbConnect() error {
 		return err
 	}
 
-	log.Default().Println("Successfully connected to db: ")
-
+	log.Default().Println("Successfully connected to db..")
 	return nil
 }
 
@@ -48,4 +56,36 @@ func ConnStr(credentials models.SecretRdsJson) string {
 		"%s:%s@tcp(%s)/%s?allowCleartextPasswords=true",
 		dbUser, password, hostName, dbName,
 	)
+}
+
+func IsUserAdminValidate(userUUID string) (bool, string) {
+	log.Default().Println("Start user status validation..")
+
+	err := DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return false, err.Error()
+	}
+	defer Db.Close()
+
+	sentence := "SELECT 1 FROM users where User_UUID = '" + userUUID + "' AND User_Status = 0"
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
+
+	rows, errSql := Db.Query(sentence)
+	if errSql != nil {
+		log.Default().Println("Error executing SQL sentence..")
+		return false, errSql.Error()
+	}
+
+	var queryResult string
+	rows.Next()
+	rows.Scan(&queryResult)
+
+	log.Default().Println("User validation return status: " + queryResult)
+
+	if queryResult != "1" {
+		return false, "User is not an admin."
+	}
+
+	return true, ""
 }

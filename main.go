@@ -40,7 +40,7 @@ func ExecuteLambda(context context.Context, request events.APIGatewayV2HTTPReque
 	}
 
 	//call to handling the incoming request
-	status, message := handlers.Handlers(path, method, body, requestHeaders, &request)
+	status, message := handlers.Handlers(path, method, body, requestHeaders, request)
 
 	//build response
 	res = &events.APIGatewayProxyResponse{

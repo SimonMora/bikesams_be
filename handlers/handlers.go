@@ -2,18 +2,20 @@ package handlers
 
 import (
 	"log"
+	"net/http"
 	"strconv"
 
 	"github.com/SimonMora/bikesams_be/auth"
+	"github.com/SimonMora/bikesams_be/routes"
 	"github.com/aws/aws-lambda-go/events"
 )
 
-const CATEGORY = "categories"
-const PRODUCTS = "products"
-const USERS = "users"
-const ADDRESS = "address"
-const ORDERS = "orders"
-const STOCK = "stock"
+const CATEGORY = "cate"
+const PRODUCTS = "prod"
+const USERS = "user"
+const ADDRESS = "addr"
+const ORDERS = "orde"
+const STOCK = "stoc"
 
 func Handlers(path string, method string, body string, headers map[string]string, request events.APIGatewayV2HTTPRequest) (int, string) {
 	log.Default().Printf("Start to handle the request from: %s with method type %s\n", path, method)
@@ -27,7 +29,7 @@ func Handlers(path string, method string, body string, headers map[string]string
 		return status, userMsg
 	}
 
-	switch path {
+	switch path[0:4] {
 	case CATEGORY:
 		return handleCategoriesRequest(body, path, method, userMsg, id, request)
 	case PRODUCTS:
@@ -46,9 +48,11 @@ func Handlers(path string, method string, body string, headers map[string]string
 }
 
 func validateAuthorization(path string, method string, headers map[string]string) (bool, int, string) {
+	log.Default().Println("Start to validate Authorization..")
 
-	if (path == "products" && method == "GET") ||
-		(path == "category" && method == "GET") {
+	if (path == "products" && method == http.MethodGet) ||
+		(path == "category" && method == http.MethodGet) {
+		log.Default().Println("Authorization is not required..")
 		return true, 200, ""
 	}
 
@@ -69,12 +73,15 @@ func validateAuthorization(path string, method string, headers map[string]string
 	}
 
 	log.Default().Println("The token is OK..")
-
 	return true, 200, msg
 
 }
 
 func handleCategoriesRequest(body string, path string, method string, user string, id string, event events.APIGatewayV2HTTPRequest) (int, string) {
+	switch method {
+	case http.MethodPost:
+		return routes.ProcessCategoryRequest(body, user)
+	}
 	return 400, "Invalid Method"
 }
 
