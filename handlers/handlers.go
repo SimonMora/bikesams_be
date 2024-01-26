@@ -85,6 +85,8 @@ func handleCategoriesRequest(body string, path string, method string, user strin
 		return routes.UpdateCategory(body, user, id)
 	case http.MethodDelete:
 		return routes.DeleteCategory(user, id)
+	case http.MethodGet:
+		return routes.SelectCategories(event)
 	}
 	return 400, "Invalid Method"
 }
