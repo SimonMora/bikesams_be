@@ -92,6 +92,10 @@ func handleCategoriesRequest(body string, path string, method string, user strin
 }
 
 func handleProductsRequest(body string, path string, method string, user string, id int, event events.APIGatewayV2HTTPRequest) (int, string) {
+	switch method {
+	case http.MethodPost:
+		return routes.InsertProducts(body, user)
+	}
 	return 400, "Invalid Method"
 }
 
