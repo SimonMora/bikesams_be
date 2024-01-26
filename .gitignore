@@ -18,6 +18,6 @@
 # vendor/
 main
 *.zip
-
+compile.sh
 # Go workspace file
 go.work
