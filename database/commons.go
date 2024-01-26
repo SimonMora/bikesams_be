@@ -53,7 +53,7 @@ func ConnStr(credentials models.SecretRdsJson) string {
 	hostName = credentials.Host
 	dbName = "bikesams"
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s)/%s?allowCleartextPasswords=true",
+		"%s:%s@tcp(%s)/%s?allowCleartextPasswords=true&parseTime=true",
 		dbUser, password, hostName, dbName,
 	)
 }

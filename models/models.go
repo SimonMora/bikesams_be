@@ -15,6 +15,6 @@ type SignUp struct {
 }
 
 type PaginatedProduct struct {
-	TotalItems int       `json:"username"`
+	TotalItems int       `json:"totalItems"`
 	Data       []Product `json:"data"`
 }
