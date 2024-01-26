@@ -13,3 +13,8 @@ type SignUp struct {
 	UserEmail string `json:"UserEmail"`
 	UserUUID  string `json:"UserUIID"`
 }
+
+type PaginatedProduct struct {
+	TotalItems int       `json:"username"`
+	Data       []Product `json:"data"`
+}

@@ -99,6 +99,8 @@ func handleProductsRequest(body string, path string, method string, user string,
 		return routes.UpdateProduct(body, user, id)
 	case http.MethodDelete:
 		return routes.DeleteProduct(user, id)
+	case http.MethodGet:
+		return routes.SelectProduct(event)
 	}
 	return 400, "Invalid Method"
 }

@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/SimonMora/bikesams_be/database"
 	"github.com/SimonMora/bikesams_be/models"
+	"github.com/aws/aws-lambda-go/events"
 )
 
 func InsertProducts(body string, User string) (int, string) {
@@ -68,7 +70,7 @@ func UpdateProduct(body string, User string, id int) (int, string) {
 		return 400, msg
 	}
 
-	prod.ProdId = int64(id)
+	prod.ProdId = id
 	_, updateErr := database.UpdateProduct(prod)
 	if updateErr != nil {
 		return 400, "Error when trying to update the product: " + strconv.Itoa(id) + " > " + updateErr.Error()
@@ -94,4 +96,61 @@ func DeleteProduct(User string, id int) (int, string) {
 	}
 
 	return 200, "Product deleted"
+}
+
+func SelectProduct(request events.APIGatewayV2HTTPRequest) (int, string) {
+	var t models.ProductRequest
+	var res models.PaginatedProduct
+	var page, pageSize int
+	var orderType, orderField string
+	var err error
+
+	param := request.QueryStringParameters
+
+	page, _ = strconv.Atoi(param["page"])
+	pageSize, _ = strconv.Atoi(param["pageSize"])
+	orderType = param["orderType"]
+	orderField = param["orderField"]
+
+	if !strings.Contains("ITDFPCS", orderType) {
+		orderField = ""
+	}
+
+	var choice string
+	if len(param["prodId"]) > 0 {
+		choice = "P"
+		t.ProdId, _ = strconv.Atoi(param["prodId"])
+	}
+	if len(param["search"]) > 0 {
+		choice = "S"
+		t.ProdSearch = param["search"]
+	}
+	if len(param["categId"]) > 0 {
+		choice = "C"
+		t.ProdCategoryId, _ = strconv.Atoi(param["categId"])
+	}
+	if len(param["slug"]) > 0 {
+		choice = "U"
+		t.ProdPath = param["slug"]
+	}
+	if len(param["slugCateg"]) > 0 {
+		choice = "K"
+		t.ProdCategPath = param["slugCateg"]
+	}
+
+	log.Default().Println(param)
+
+	res, err = database.SelectProduct(t, choice, page, pageSize, orderType, orderField)
+	if err != nil {
+		log.Default().Println("There was an error trying to get the products from the database, search type: " + choice + " in product database. > " + err.Error())
+		return 500, "There was an error trying to get the products from the database, search type: " + choice + " in product database."
+	}
+
+	byteResp, errM := json.Marshal(res)
+	if errM != nil {
+		log.Default().Println("There was an error unmarshal product. " + errM.Error())
+		return 500, "There was an error unmarshal product."
+	}
+
+	return 200, string(byteResp)
 }

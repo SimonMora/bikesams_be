@@ -22,7 +22,7 @@ type ProductResponse struct {
 }
 
 type ProductRequest struct {
-	ProdId          int64     `json:"prodId"`
+	ProdId          int       `json:"prodId"`
 	ProdTitle       string    `json:"prodTitle"`
 	ProdDescription string    `json:"prodDescription"`
 	ProdCreatedAt   time.Time `json:"prodCreatedAt"`
