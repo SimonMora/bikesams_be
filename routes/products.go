@@ -76,3 +76,22 @@ func UpdateProduct(body string, User string, id int) (int, string) {
 
 	return 200, "Updated entity"
 }
+
+func DeleteProduct(User string, id int) (int, string) {
+	if id == 0 {
+		return 400, "Product id is required to delete products."
+	}
+
+	//validate if the user is and admin or not
+	isAdmin, msg := database.IsUserAdminValidate(User)
+	if !isAdmin {
+		return 400, msg
+	}
+
+	err := database.DeleteProduct(id)
+	if err != nil {
+		return 400, "Error when trying to delete the product: " + strconv.Itoa(id) + " > " + err.Error()
+	}
+
+	return 200, "Product deleted"
+}

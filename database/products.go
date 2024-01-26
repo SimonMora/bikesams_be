@@ -103,7 +103,7 @@ func UpdateProduct(prod models.ProductRequest) (models.ProductResponse, error) {
 	sentence = util.BuildUpdateSentence(sentence, "Prod_Path", prod.ProdPath)
 
 	sentence += " WHERE Prod_Id = " + strconv.Itoa(int(prod.ProdId))
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	_, err = Db.Exec(sentence)
 	if err != nil {
@@ -114,4 +114,28 @@ func UpdateProduct(prod models.ProductRequest) (models.ProductResponse, error) {
 
 	log.Default().Printf("Product successfully updated with id: %d.", prod.ProdId)
 	return res, nil
+}
+
+func DeleteProduct(id int) error {
+	log.Default().Println("Start to Delete Products from database")
+	var err error
+
+	err = DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return err
+	}
+	defer Db.Close()
+
+	sentence := "DELETE FROM products WHERE Prod_Id = " + strconv.Itoa(id)
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
+
+	_, err = Db.Exec(sentence)
+	if err != nil {
+		log.Default().Println("Error executing update in the products table: " + err.Error())
+		return err
+	}
+
+	log.Default().Printf("Category successfully deleted with id: %d.", id)
+	return nil
 }
