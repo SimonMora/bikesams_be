@@ -78,5 +78,30 @@ func UpdateCategory(category models.Category) error {
 		return err
 	}
 
+	log.Default().Printf("Category successfully updated with id: %d.", category.Categ_Id)
+	return nil
+}
+
+func DeleteCategory(id int) error {
+	log.Default().Println("Start to Delete Category from database")
+	var err error
+
+	err = DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return err
+	}
+	defer Db.Close()
+
+	sentence := "DELETE FROM category WHERE Categ_Id = " + strconv.Itoa(id)
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
+
+	_, err = Db.Exec(sentence)
+	if err != nil {
+		log.Default().Println("Error executing update in the category table: " + err.Error())
+		return err
+	}
+
+	log.Default().Printf("Category successfully deleted with id: %d.", id)
 	return nil
 }

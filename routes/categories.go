@@ -74,5 +74,24 @@ func UpdateCategory(body string, User string, id int) (int, string) {
 		return 400, "Error when trying to update the category: " + strconv.Itoa(id) + " > " + updateErr.Error()
 	}
 
-	return 200, "Updated entity."
+	return 200, "Updated entity"
+}
+
+func DeleteCategory(User string, id int) (int, string) {
+	if id == 0 {
+		return 400, "Category id is required to delete categories."
+	}
+
+	//validate if the user is and admin or not
+	isAdmin, msg := database.IsUserAdminValidate(User)
+	if !isAdmin {
+		return 400, msg
+	}
+
+	err := database.DeleteCategory(id)
+	if err != nil {
+		return 400, "Error when trying to delete the category: " + strconv.Itoa(id) + " > " + err.Error()
+	}
+
+	return 200, "Category deleted"
 }
