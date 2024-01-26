@@ -31,11 +31,11 @@ func Handlers(path string, method string, body string, headers map[string]string
 
 	switch path[0:4] {
 	case CATEGORY:
-		return handleCategoriesRequest(body, path, method, userMsg, id, request)
+		return handleCategoriesRequest(body, path, method, userMsg, numId, request)
 	case PRODUCTS:
 		return handleProductsRequest(body, path, method, userMsg, numId, request)
 	case USERS:
-		return handleUsersRequest(body, path, method, userMsg, numId, request)
+		return handleUsersRequest(body, path, method, userMsg, id, request)
 	case ADDRESS:
 		return handleAddressRequest(body, path, method, userMsg, numId, request)
 	case ORDERS:
@@ -77,10 +77,12 @@ func validateAuthorization(path string, method string, headers map[string]string
 
 }
 
-func handleCategoriesRequest(body string, path string, method string, user string, id string, event events.APIGatewayV2HTTPRequest) (int, string) {
+func handleCategoriesRequest(body string, path string, method string, user string, id int, event events.APIGatewayV2HTTPRequest) (int, string) {
 	switch method {
 	case http.MethodPost:
 		return routes.ProcessCategoryRequest(body, user)
+	case http.MethodPut:
+		return routes.UpdateCategory(body, user, id)
 	}
 	return 400, "Invalid Method"
 }
@@ -89,7 +91,7 @@ func handleProductsRequest(body string, path string, method string, user string,
 	return 400, "Invalid Method"
 }
 
-func handleUsersRequest(body string, path string, method string, user string, id int, event events.APIGatewayV2HTTPRequest) (int, string) {
+func handleUsersRequest(body string, path string, method string, user string, id string, event events.APIGatewayV2HTTPRequest) (int, string) {
 	return 400, "Invalid Method"
 }
 
