@@ -58,8 +58,8 @@ func UpdateCategory(body string, User string, id int) (int, string) {
 		return 400, "Bad request, body is not category parseable."
 	}
 
-	if len(t.Categ_Name) == 0 || len(t.Categ_Path) == 0 {
-		return 400, "Bad request, category name and category path, are required."
+	if len(t.Categ_Name) == 0 && len(t.Categ_Path) == 0 {
+		return 400, "Bad request, category name or category path, are required to update."
 	}
 
 	//validate if the user is and admin or not
