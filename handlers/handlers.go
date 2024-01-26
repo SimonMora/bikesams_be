@@ -95,6 +95,8 @@ func handleProductsRequest(body string, path string, method string, user string,
 	switch method {
 	case http.MethodPost:
 		return routes.InsertProducts(body, user)
+	case http.MethodPut:
+		return routes.UpdateProduct(body, user, id)
 	}
 	return 400, "Invalid Method"
 }

@@ -21,7 +21,7 @@ func InsertProducts(body string, User string) (int, string) {
 		return 400, "Error parsing the body to product, please verify"
 	}
 
-	if len(product.Prod_Title) == 0 {
+	if len(product.ProdTitle) == 0 {
 		return 400, "Product title must be specified"
 	}
 
@@ -43,7 +43,36 @@ func InsertProducts(body string, User string) (int, string) {
 		return 500, err.Error()
 	}
 
-	log.Default().Println("Product insert was successful, with product id: " + strconv.Itoa(int(response.Prod_Id)))
+	log.Default().Println("Product insert was successful, with product id: " + strconv.Itoa(int(response.ProdId)))
 	return 200, string(byteRes)
 
+}
+
+func UpdateProduct(body string, User string, id int) (int, string) {
+	log.Default().Println("Start to process to update category..")
+	if id == 0 {
+		return 400, "Product id is required to update the product."
+	}
+
+	var prod models.ProductRequest
+
+	// unmarshal body to struct and start body validations
+	err := json.Unmarshal([]byte(body), &prod)
+	if err != nil {
+		return 400, "Bad request, body is not product parseable."
+	}
+
+	//validate if the user is and admin or not
+	isAdmin, msg := database.IsUserAdminValidate(User)
+	if !isAdmin {
+		return 400, msg
+	}
+
+	prod.ProdId = int64(id)
+	_, updateErr := database.UpdateProduct(prod)
+	if updateErr != nil {
+		return 400, "Error when trying to update the product: " + strconv.Itoa(id) + " > " + updateErr.Error()
+	}
+
+	return 200, "Updated entity"
 }
