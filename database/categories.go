@@ -70,7 +70,7 @@ func UpdateCategory(category models.Category) error {
 	}
 
 	sentence += " WHERE Categ_Id = " + strconv.Itoa(category.Categ_Id)
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	_, err = Db.Exec(sentence)
 	if err != nil {

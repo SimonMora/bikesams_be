@@ -59,7 +59,7 @@ func UpdateCategory(body string, User string, id int) (int, string) {
 	}
 
 	if len(t.Categ_Name) == 0 && len(t.Categ_Path) == 0 {
-		return 400, "Bad request, category name or category path, are required to update."
+		return 400, "Bad request, category name or category path are required to update."
 	}
 
 	//validate if the user is and admin or not
