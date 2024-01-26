@@ -57,7 +57,7 @@ func InsertProducts(product models.Product) (models.ProductResponse, error) {
 	values += ")"
 
 	sentence += values
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	var queryResult sql.Result
 
