@@ -125,11 +125,11 @@ func SelectCategories(categId int, slug string) ([]models.Category, error) {
 		sentence += "WHERE Categ_Id = " + strconv.Itoa(categId)
 	} else {
 		if len(slug) > 0 {
-			sentence += "WHERE Categ_Path = '" + util.ScapeString(slug) + "'"
+			sentence += "WHERE Categ_Path LIKE '%" + util.ScapeString(slug) + "%'"
 		}
 	}
 
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	result, err = Db.Query(sentence)
 	if err != nil {
