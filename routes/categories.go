@@ -7,6 +7,7 @@ import (
 
 	"github.com/SimonMora/bikesams_be/database"
 	"github.com/SimonMora/bikesams_be/models"
+	"github.com/aws/aws-lambda-go/events"
 )
 
 func ProcessCategoryRequest(body string, User string) (int, string) {
@@ -94,4 +95,36 @@ func DeleteCategory(User string, id int) (int, string) {
 	}
 
 	return 200, "Category deleted"
+}
+
+func SelectCategories(request events.APIGatewayV2HTTPRequest) (int, string) {
+	var err error
+	var Categ_Id int
+	var Slug string
+
+	rCatId := request.QueryStringParameters["categId"]
+	rSlug := request.QueryStringParameters["slug"]
+
+	if len(rCatId) > 0 {
+		Categ_Id, err = strconv.Atoi(rCatId)
+		if err != nil {
+			return 500, "Error parsing the category id sent: " + rCatId + " > " + err.Error()
+		}
+	} else {
+		if len(rSlug) > 0 {
+			Slug = rSlug
+		}
+	}
+
+	lista, errSelect := database.SelectCategories(Categ_Id, Slug)
+	if errSelect != nil {
+		return 500, "Error on select categories: " + errSelect.Error()
+	}
+
+	Categ, errMarshal := json.Marshal(lista)
+	if errMarshal != nil {
+		return 500, "Error on marshal to Json the categories list: " + errMarshal.Error()
+	}
+
+	return 200, string(Categ)
 }

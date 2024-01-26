@@ -105,3 +105,56 @@ func DeleteCategory(id int) error {
 	log.Default().Printf("Category successfully deleted with id: %d.", id)
 	return nil
 }
+
+func SelectCategories(categId int, slug string) ([]models.Category, error) {
+	log.Default().Println("Start to Select Categories from database")
+	var err error
+	var Categs []models.Category
+	var result *sql.Rows
+
+	err = DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return Categs, err
+	}
+
+	defer Db.Close()
+
+	sentence := "SELECT * FROM category "
+	if categId != 0 {
+		sentence += "WHERE Categ_Id = " + strconv.Itoa(categId)
+	} else {
+		if len(slug) > 0 {
+			sentence += "WHERE Categ_Path = '" + util.ScapeString(slug) + "'"
+		}
+	}
+
+	log.Default().Println(sentence) //Only uncomment for debug purposes
+
+	result, err = Db.Query(sentence)
+	if err != nil {
+		log.Default().Println("Error executing select in the category table: " + err.Error())
+		return Categs, err
+	}
+
+	for result.Next() {
+		var c models.Category
+		var categId sql.NullInt32
+		var categName sql.NullString
+		var categPath sql.NullString
+
+		err := result.Scan(&categId, &categName, &categPath)
+		if err != nil {
+			log.Default().Println("Error extracting result set from select in the category table: " + err.Error())
+			return Categs, err
+		}
+		c.Categ_Id = int(categId.Int32)
+		c.Categ_Name = categName.String
+		c.Categ_Path = categPath.String
+
+		Categs = append(Categs, c)
+	}
+
+	log.Default().Printf("Categories select successfully executed \n")
+	return Categs, nil
+}
