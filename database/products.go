@@ -291,7 +291,7 @@ func UpdateStock(prod models.ProductRequest) error {
 	}
 	defer Db.Close()
 
-	sentence := "UPDATE products SET Prod_Stock = Prod_Stock + " + strconv.Itoa(prod.ProdStock) + " WHERE Product_Id = " + strconv.Itoa(prod.ProdId)
+	sentence := "UPDATE products SET Prod_Stock = Prod_Stock + " + strconv.Itoa(prod.ProdStock) + " WHERE Prod_Id = " + strconv.Itoa(prod.ProdId)
 
 	_, err = Db.Exec(sentence)
 	if err != nil {
