@@ -51,7 +51,7 @@ func InsertProducts(body string, User string) (int, string) {
 }
 
 func UpdateProduct(body string, User string, id int) (int, string) {
-	log.Default().Println("Start to process to update category..")
+	log.Default().Println("Start to process to update product..")
 	if id == 0 {
 		return 400, "Product id is required to update the product."
 	}
@@ -80,6 +80,7 @@ func UpdateProduct(body string, User string, id int) (int, string) {
 }
 
 func DeleteProduct(User string, id int) (int, string) {
+	log.Default().Println("Start to process to delete product..")
 	if id == 0 {
 		return 400, "Product id is required to delete products."
 	}
@@ -99,6 +100,7 @@ func DeleteProduct(User string, id int) (int, string) {
 }
 
 func SelectProduct(request events.APIGatewayV2HTTPRequest) (int, string) {
+	log.Default().Println("Start to select products..")
 	var t models.ProductRequest
 	var res models.PaginatedProduct
 	var page, pageSize int
@@ -153,4 +155,33 @@ func SelectProduct(request events.APIGatewayV2HTTPRequest) (int, string) {
 	}
 
 	return 200, string(byteResp)
+}
+
+func UpdateStock(body string, User string, id int) (int, string) {
+	log.Default().Println("Start to process to update product stock..")
+	if id == 0 {
+		return 400, "Product id is required to update the product."
+	}
+
+	var prod models.ProductRequest
+
+	// unmarshal body to struct and start body validations
+	err := json.Unmarshal([]byte(body), &prod)
+	if err != nil {
+		return 400, "Bad request, body is not product parseable."
+	}
+
+	//validate if the user is and admin or not
+	isAdmin, msg := database.IsUserAdminValidate(User)
+	if !isAdmin {
+		return 400, msg
+	}
+
+	prod.ProdId = id
+	updateErr := database.UpdateStock(prod)
+	if updateErr != nil {
+		return 400, "Error when trying to update the product: " + strconv.Itoa(id) + " > " + updateErr.Error()
+	}
+
+	return 200, "Updated stock"
 }

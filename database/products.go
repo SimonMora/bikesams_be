@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"strconv"
 	"strings"
@@ -154,7 +155,7 @@ func SelectProduct(prod models.ProductRequest, choice string, page int, pageSize
 	var sentence, countSentence, where, limit string
 
 	sentence = "SELECT p.Prod_Id, p.Prod_Title, p.Prod_Description, p.Prod_CreatedAt, p.Prod_Updated, p.Prod_Price, p.Prod_Path, p.Prod_CategoryId, p.Prod_Stock FROM products p"
-	countSentence = "SELECT count(p.*) as records FROM products p"
+	countSentence = "SELECT count(*) as records FROM products p"
 
 	switch choice {
 	case "P":
@@ -170,6 +171,7 @@ func SelectProduct(prod models.ProductRequest, choice string, page int, pageSize
 	}
 
 	countSentence += where
+	log.Default().Println(countSentence) //Only uncomment for debug purposes
 
 	var result *sql.Rows
 
@@ -232,7 +234,7 @@ func SelectProduct(prod models.ProductRequest, choice string, page int, pageSize
 	sentence += where + orderBy + limit
 	log.Default().Println(sentence) //Only uncomment for debug purposes
 
-	result, err = Db.Query(countSentence)
+	result, err = Db.Query(sentence)
 	if err != nil {
 		log.Default().Println("Error executing main select in the products table: " + err.Error())
 		return Resp, err
@@ -272,5 +274,31 @@ func SelectProduct(prod models.ProductRequest, choice string, page int, pageSize
 	Resp.TotalItems = records
 	Resp.Data = Prods
 
+	log.Default().Println("Products retrieved from the database..")
 	return Resp, nil
+}
+
+func UpdateStock(prod models.ProductRequest) error {
+	log.Default().Println("Start to Update Products Stock in the database..")
+	if prod.ProdStock == 0 {
+		return errors.New("[ERROR] the prod stock is required to update the stock.")
+	}
+
+	err := DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return err
+	}
+	defer Db.Close()
+
+	sentence := "UPDATE products SET Prod_Stock = Prod_Stock + " + strconv.Itoa(prod.ProdStock) + " WHERE Prod_Id = " + strconv.Itoa(prod.ProdId)
+
+	_, err = Db.Exec(sentence)
+	if err != nil {
+		log.Default().Println("Error executing update in the category table: " + err.Error())
+		return err
+	}
+
+	log.Default().Println("Products stock updated in the database, product id : " + strconv.Itoa(prod.ProdId))
+	return nil
 }

@@ -118,5 +118,5 @@ func handleOrdersRequest(body string, path string, method string, user string, i
 }
 
 func handleStockRequest(body string, path string, method string, user string, id int, event events.APIGatewayV2HTTPRequest) (int, string) {
-	return 400, "Invalid Method"
+	return routes.UpdateStock(body, user, id)
 }
