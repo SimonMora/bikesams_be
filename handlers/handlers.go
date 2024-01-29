@@ -106,6 +106,10 @@ func handleProductsRequest(body string, path string, method string, user string,
 }
 
 func handleUsersRequest(body string, path string, method string, user string, id string, event events.APIGatewayV2HTTPRequest) (int, string) {
+	switch method {
+	case http.MethodPut:
+		return routes.UpdateUser(body, user)
+	}
 	return 400, "Invalid Method"
 }
 
