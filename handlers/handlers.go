@@ -124,6 +124,12 @@ func handleUsersRequest(body string, path string, method string, user string, id
 }
 
 func handleAddressRequest(body string, path string, method string, user string, id int, event events.APIGatewayV2HTTPRequest) (int, string) {
+	switch method {
+	case http.MethodPost:
+		return routes.InsertAddress(body, user)
+	case http.MethodPut:
+		return routes.UpdateAddress(body, user, id)
+	}
 	return 400, "Invalid Method"
 }
 
