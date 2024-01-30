@@ -20,7 +20,7 @@ func InsertAddress(request models.AddressRequest, user string) (models.AddressRe
 	}
 	defer Db.Close()
 
-	sentence := "INSERT INTO addresses (`Add_UserID`,`Add_Address`,`Add_City`,`Add_State`,`Add_PostalCode`,`Add_Phone`,`Add_Title`,`Add_Name`)"
+	sentence := "INSERT INTO addresses (Add_UserID,Add_Address,Add_City,Add_State,Add_PostalCode,Add_Phone,Add_Title,Add_Name)"
 	sentence += "VALUES ('" + user + "', '" + request.AddAddress + "', '" + request.AddCity + "', '" + request.AddState + "', '" + request.AddPostalCode + "', '" + request.AddPhone + "', '" + request.AddTitle + "', '" + request.AddName + "')"
 	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
@@ -49,7 +49,7 @@ func AddressExists(user string, id int) (bool, error) {
 	defer Db.Close()
 
 	sentence := "SELECT 1 FROM addresses WHERE Add_Id = '" + strconv.Itoa(id) + "' AND Add_UserId = '" + user + "'"
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	var rows *sql.Rows
 	rows, err = Db.Query(sentence)
@@ -106,7 +106,7 @@ func UpdateAddress(request models.AddressRequest) error {
 
 	sentence, _ = strings.CutSuffix(sentence, ", ")
 	sentence += "WHERE Add_Id = " + strconv.Itoa(request.AddId)
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	_, err = Db.Query(sentence)
 	if err != nil {
@@ -116,4 +116,68 @@ func UpdateAddress(request models.AddressRequest) error {
 
 	log.Default().Println("Update Address was successful..")
 	return nil
+}
+
+func DeleteAddress(id int) error {
+	log.Default().Println("Start delete Address processing..")
+
+	err := DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return err
+	}
+	defer Db.Close()
+
+	sentence := "DELETE FROM addresses WHERE Add_Id = " + strconv.Itoa(id)
+	_, err = Db.Query(sentence)
+	if err != nil {
+		log.Default().Println("Error executing the sentence in the database.. " + err.Error())
+		return err
+	}
+
+	log.Default().Println("Delete Address was successful..")
+	return nil
+}
+
+func SelectAddressByUserId(user string) ([]models.AddressResponse, error) {
+	var addResp []models.AddressResponse
+
+	err := DbConnect()
+	if err != nil {
+		log.Default().Println("Error connecting to the database..")
+		return addResp, err
+	}
+	defer Db.Close()
+
+	sentence := "SELECT Add_Id, Add_Address, Add_City, Add_State, Add_PostalCode, Add_Phone, Add_Title, Add_Name FROM addresses"
+	sentence += " WHERE Add_UserId = '" + user + "'"
+	log.Default().Println(sentence) //Only uncomment for debug purposes
+
+	var rows *sql.Rows
+	rows, err = Db.Query(sentence)
+	if err != nil {
+		log.Default().Println("Error executing the sentence in the database.. " + err.Error())
+		return addResp, err
+	}
+
+	for rows.Next() {
+		var addDb models.Address
+		add := models.AddressResponse{}
+
+		err = rows.Scan(
+			&addDb.Add_Id, &addDb.Add_Address, &addDb.Add_City,
+			&addDb.Add_State, &addDb.Add_PostalCode, &addDb.Add_Phone,
+			&addDb.Add_Title, &addDb.Add_Name,
+		)
+		if err != nil {
+			log.Default().Println("Error executing the sentence in the database.. " + err.Error())
+			return []models.AddressResponse{}, err
+		}
+
+		add.FillEntityDb(addDb)
+		addResp = append(addResp, add)
+	}
+
+	log.Default().Println("Addresses retrieved successfully..")
+	return addResp, nil
 }
