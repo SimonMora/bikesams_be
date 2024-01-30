@@ -84,3 +84,39 @@ func UpdateAddress(body string, user string, addId int) (int, string) {
 
 	return 200, "Updated entity"
 }
+
+func DeleteAddress(user string, id int) (int, string) {
+	exist, err := database.AddressExists(user, id)
+	if !exist {
+		if err != nil {
+			log.Default().Println("The was an error searching Address.. " + err.Error())
+			return 400, err.Error()
+		}
+		log.Default().Println("The Address was not found for user: " + user + ", address id: " + strconv.Itoa(id))
+		return 400, "Address was not found"
+	}
+
+	err = database.DeleteAddress(id)
+	if err != nil {
+		log.Default().Println("The Address delete failed: " + err.Error())
+		return 500, "Error on update" + err.Error()
+	}
+
+	return 200, "Deleted entity"
+}
+
+func SelectAddress(user string) (int, string) {
+	addResp, err := database.SelectAddressByUserId(user)
+	if err != nil {
+		log.Default().Println("Error retrieving the Address from the database: " + err.Error())
+		return 500, "Database access error: " + err.Error()
+	}
+
+	addBytes, errU := json.Marshal(addResp)
+	if errU != nil {
+		log.Default().Println("Error on marshaling the Address retrieved from database: " + err.Error())
+		return 500, "Marshaling error: " + err.Error()
+	}
+
+	return 200, string(addBytes)
+}

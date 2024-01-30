@@ -46,6 +46,7 @@ func (add *AddressResponse) FillEntityReq(addReq AddressRequest) {
 }
 
 func (add *AddressResponse) FillEntityDb(addDb Address) {
+	add.AddId = addDb.Add_Id.Int64
 	add.AddAddress = addDb.Add_Address.String
 	add.AddCity = addDb.Add_City.String
 	add.AddName = addDb.Add_Name.String

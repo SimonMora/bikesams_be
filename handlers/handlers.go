@@ -129,6 +129,10 @@ func handleAddressRequest(body string, path string, method string, user string, 
 		return routes.InsertAddress(body, user)
 	case http.MethodPut:
 		return routes.UpdateAddress(body, user, id)
+	case http.MethodDelete:
+		return routes.DeleteAddress(user, id)
+	case http.MethodGet:
+		return routes.SelectAddress(user)
 	}
 	return 400, "Invalid Method"
 }
