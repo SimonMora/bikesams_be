@@ -151,7 +151,7 @@ func SelectAddressByUserId(user string) ([]models.AddressResponse, error) {
 
 	sentence := "SELECT Add_Id, Add_Address, Add_City, Add_State, Add_PostalCode, Add_Phone, Add_Title, Add_Name FROM addresses"
 	sentence += " WHERE Add_UserId = '" + user + "'"
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	var rows *sql.Rows
 	rows, err = Db.Query(sentence)
