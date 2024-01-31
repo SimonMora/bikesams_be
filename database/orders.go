@@ -42,9 +42,13 @@ func InsertOrder(order models.OrderRequest, user string) (models.OrderResponse, 
 
 	orderId, _ := result.LastInsertId()
 
-	sentenceOD := "INSERT INTO orders_detail (OD_OrderId, OD_ProdId, OD_Quantity, OD_Price) "
-	for _, od := range order.OrderDetails {
-		sentenceOD += " VALUES (" + strconv.Itoa(int(orderId)) + ", " + strconv.Itoa(od.ODProdId) + ", " + strconv.Itoa(od.ODQuantity) + ", " + strconv.FormatFloat(od.ODPrice, 'f', -1, 64) + ")"
+	sentenceOD := "INSERT INTO orders_detail (OD_OrderId, OD_ProdId, OD_Quantity, OD_Price) VALUES "
+	for index, od := range order.OrderDetails {
+		log.Default().Println(index)
+		sentenceOD += "(" + strconv.Itoa(int(orderId)) + ", " + strconv.Itoa(od.ODProdId) + ", " + strconv.Itoa(od.ODQuantity) + ", " + strconv.FormatFloat(od.ODPrice, 'f', -1, 64) + ")"
+		if index != len(order.OrderDetails)-1 {
+			sentenceOD += ", "
+		}
 	}
 	log.Default().Println(sentenceOD) //Only uncomment for debug purposes
 
