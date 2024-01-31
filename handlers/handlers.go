@@ -141,6 +141,8 @@ func handleOrdersRequest(body string, path string, method string, user string, i
 	switch method {
 	case http.MethodPost:
 		return routes.InsertOrder(body, user)
+	case http.MethodGet:
+		return routes.SelectOrders(user, event)
 	}
 	return 400, "Invalid Method"
 }

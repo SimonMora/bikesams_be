@@ -3,9 +3,11 @@ package routes
 import (
 	"encoding/json"
 	"log"
+	"strconv"
 
 	"github.com/SimonMora/bikesams_be/database"
 	"github.com/SimonMora/bikesams_be/models"
+	"github.com/aws/aws-lambda-go/events"
 )
 
 func InsertOrder(body string, user string) (int, string) {
@@ -64,4 +66,42 @@ func validOrder(order models.OrderRequest) (bool, string) {
 	}
 
 	return true, ""
+}
+
+func SelectOrders(user string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	var dateFrom, dateTo string
+	var page int
+	var orderId int
+
+	log.Default().Println(request.QueryStringParameters)
+
+	if len(request.QueryStringParameters["dateFrom"]) != 0 {
+		dateFrom = request.QueryStringParameters["dateFrom"]
+		if len(request.QueryStringParameters["dateTo"]) != 0 {
+			dateTo = request.QueryStringParameters["dateTo"]
+		} else {
+			return 400, "Date end must be provided if Date from was provided"
+		}
+	}
+
+	if len(request.QueryStringParameters["page"]) != 0 {
+		page, _ = strconv.Atoi(request.QueryStringParameters["page"])
+	}
+	if len(request.QueryStringParameters["orderId"]) != 0 {
+		orderId, _ = strconv.Atoi(request.QueryStringParameters["orderId"])
+	}
+
+	result, err := database.SelectOrders(user, dateFrom, dateTo, page, orderId)
+	if err != nil {
+		log.Default().Println("Error retrieving orders from database: " + err.Error())
+		return 500, "Error retrieving orders: " + err.Error()
+	}
+
+	oBytes, errM := json.Marshal(result)
+	if errM != nil {
+		log.Default().Println("Error parsing orders from database: " + errM.Error())
+		return 500, "Error parsing orders: " + err.Error()
+	}
+
+	return 200, string(oBytes)
 }
