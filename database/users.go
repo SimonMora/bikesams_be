@@ -24,7 +24,7 @@ func SearchUser(user string) (models.UserResponse, bool) {
 	}
 	defer Db.Close()
 
-	sentence := "SELECT User_UUID, User_Email, User_FirstName, User_LastName, User_DateUpg FROM users WHERE User_UUID = '" + user + "'"
+	sentence := "SELECT User_UUID, User_Email, User_FirstName, User_LastName, User_Status, User_DateAdd, User_DateUpg FROM users WHERE User_UUID = '" + user + "'"
 
 	result, err = Db.Query(sentence)
 	if err != nil {
@@ -33,7 +33,10 @@ func SearchUser(user string) (models.UserResponse, bool) {
 	}
 
 	result.Next()
-	err = result.Scan(&userDb.UserUUID, &userDb.User_Email, &userDb.User_FirstName, &userDb.User_LastName, &userDb.User_DateUpg)
+	err = result.Scan(
+		&userDb.UserUUID, &userDb.User_Email, &userDb.User_FirstName,
+		&userDb.User_LastName, &userDb.User_Status, &userDb.User_DateAdd,
+		&userDb.User_DateUpg)
 	if err != nil {
 		log.Default().Println("Error parsing the user retrieved from the database.. " + err.Error())
 		return userResp, false
@@ -42,7 +45,9 @@ func SearchUser(user string) (models.UserResponse, bool) {
 		userResp.User_Email = userDb.User_Email.String
 		userResp.User_FirstName = userDb.User_FirstName.String
 		userResp.User_LastName = userDb.User_LastName.String
+		userResp.User_Status = userDb.User_Status.Int16
 		userResp.User_DateUpg = userDb.User_DateUpg.Time
+		userResp.User_DateAdd = userDb.User_DateAdd.Time
 	}
 
 	return userResp, true
