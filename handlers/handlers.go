@@ -51,7 +51,7 @@ func validateAuthorization(path string, method string, headers map[string]string
 	log.Default().Println("Start to validate Authorization..")
 
 	if (path == "products" && method == http.MethodGet) ||
-		(path == "category" && method == http.MethodGet) {
+		(path == "categories" && method == http.MethodGet) {
 		log.Default().Println("Authorization is not required..")
 		return true, 200, ""
 	}
