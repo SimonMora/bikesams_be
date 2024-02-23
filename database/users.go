@@ -93,7 +93,7 @@ func UpdateUser(request models.UserRequest, user string) (models.UserResponse, e
 
 func SelectAllUsers(page int) (models.PaginatedUsers, error) {
 	log.Default().Println("Start Select All users ..")
-	var users models.PaginatedUsers
+	users := models.PaginatedUsers{}
 
 	err := DbConnect()
 	if err != nil {
@@ -108,7 +108,7 @@ func SelectAllUsers(page int) (models.PaginatedUsers, error) {
 	countSentence := "SELECT count(*) FROM users"
 
 	if page > 1 {
-		sentence += " OFFSET " + strconv.Itoa(offset)
+		sentence += " LIMIT 10 OFFSET " + strconv.Itoa(offset)
 	}
 
 	var result *sql.Rows
@@ -146,6 +146,10 @@ func SelectAllUsers(page int) (models.PaginatedUsers, error) {
 
 		user.ParseUser(dbUser)
 		users.Data = append(users.Data, user)
+	}
+
+	if users.Data == nil {
+		users.Data = []models.UserResponse{}
 	}
 
 	log.Default().Println("Retrieve all users sucessfull..")
