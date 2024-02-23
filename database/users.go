@@ -91,9 +91,9 @@ func UpdateUser(request models.UserRequest, user string) (models.UserResponse, e
 	return userResp, nil
 }
 
-func SelectAllUsers(page int) ([]models.UserResponse, error) {
+func SelectAllUsers(page int) (models.PaginatedUsers, error) {
 	log.Default().Println("Start Select All users ..")
-	var users []models.UserResponse
+	var users models.PaginatedUsers
 
 	err := DbConnect()
 	if err != nil {
@@ -121,8 +121,9 @@ func SelectAllUsers(page int) ([]models.UserResponse, error) {
 		log.Default().Println("Error retrieving count of users from the database: " + err.Error())
 		return users, err
 	}
+	users.TotalItems = int(records.Int32)
 
-	log.Default().Println(sentence) //Only uncomment for debug purposes
+	//log.Default().Println(sentence) //Only uncomment for debug purposes
 
 	result, err = Db.Query(sentence)
 	if err != nil {
@@ -140,11 +141,11 @@ func SelectAllUsers(page int) ([]models.UserResponse, error) {
 		)
 		if err != nil {
 			log.Default().Println("Error parsing users: " + err.Error())
-			return []models.UserResponse{}, err
+			return models.PaginatedUsers{}, err
 		}
 
 		user.ParseUser(dbUser)
-		users = append(users, user)
+		users.Data = append(users.Data, user)
 	}
 
 	log.Default().Println("Retrieve all users sucessfull..")

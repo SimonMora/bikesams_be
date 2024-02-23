@@ -18,3 +18,8 @@ type PaginatedProduct struct {
 	TotalItems int       `json:"totalItems"`
 	Data       []Product `json:"data"`
 }
+
+type PaginatedUsers struct {
+	TotalItems int            `json:"totalItems"`
+	Data       []UserResponse `json:"data"`
+}
