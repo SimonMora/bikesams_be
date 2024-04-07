@@ -167,7 +167,7 @@ func SelectProduct(prod models.ProductRequest, choice string, page int, pageSize
 	case "U":
 		where = " WHERE UCASE(p.Prod_Path) like '%" + strings.ToUpper(util.ScapeString(prod.ProdPath)) + "%'"
 	case "K":
-		where = "INNER JOIN category c ON p.Prod_CategoryId = c.Categ_Id WHERE c.Categ_Path LIKE '%" + strings.ToUpper(util.ScapeString(prod.ProdCategPath)) + "%'"
+		where = " INNER JOIN category c ON p.Prod_CategoryId = c.Categ_Id WHERE c.Categ_Path LIKE '%" + strings.ToUpper(util.ScapeString(prod.ProdCategPath)) + "%'"
 	}
 
 	countSentence += where
